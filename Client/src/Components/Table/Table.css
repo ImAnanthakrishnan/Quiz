@@ -1,0 +1,25 @@
+.table-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .table-image {
+    width: 50px; /* Adjust the size as needed */
+    height: auto;
+  }
+  
