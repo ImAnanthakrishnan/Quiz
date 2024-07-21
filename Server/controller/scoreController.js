@@ -10,18 +10,50 @@ const score = asyncHandler(async (req, res) => {
     });
   }
 
-  const newScore = await Score.create({
-    user: req.userId,
-    score,
-    difficulty: level,
-  });
+  try {
+    const existingScore = await Score.findOne({
+      user: req.userId,
+      difficulty: level,
+    });
 
-  if (newScore) {
-    res.status(200).json({
-      message: "Sucessfull",
+    if (existingScore) {
+      if (existingScore.score < score) {
+        const updatedScore = await Score.updateOne(
+          { user: req.userId, difficulty: level },
+          { $set: { score: score } }
+        );
+
+        if (updatedScore) {
+          return res.status(200).json({
+            message: "Successful",
+          });
+        }
+      } else {
+        return res.status(200).json({
+          message: "No update needed, score is not higher",
+        });
+      }
+    } else {
+      const newScore = await Score.create({
+        user: req.userId,
+        score,
+        difficulty: level,
+      });
+
+      if (newScore) {
+        return res.status(200).json({
+          message: "Successful",
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error finding or updating score:', error.message);
+    return res.status(500).json({
+      message: "Server error",
     });
   }
 });
+
 
 const getScore = asyncHandler(async (req, res) => {
   const { level } = req.query;
@@ -41,19 +73,17 @@ const getScore = asyncHandler(async (req, res) => {
       $project: {
         "users.name": 1,
         score: 1,
-        difficulty: 1
+        difficulty: 1,
       },
     },
   ]);
-  
 
-  if(scores){
+  if (scores) {
     res.status(200).json({
-        message:'success',
-        data:scores
-    })
+      message: "success",
+      data: scores,
+    });
   }
- 
 });
 
 module.exports = {
